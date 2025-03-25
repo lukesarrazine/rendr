@@ -87,7 +87,7 @@ local time = 0
 
 while time < 500 do
     local rotated_vertices = rotate_model(model.vertices, angle_y)
-    draw_ascii(rotated_vertices, 2)
+    draw_ascii(rotated_vertices, 1)
     angle_y = angle_y + 1
     time = time + 1
     os.execute("sleep 0.01")
