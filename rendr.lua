@@ -38,6 +38,14 @@ local function project_perspective(x, y, z, f)
     return X, Y
 end
 
+local function rotate_y(x, y, z, angle)
+    local rad = math.rad(angle)
+    local cos_a, sin_a = math.cos(rad), math.sin(rad)
+    local new_x = x * cos_a + z * sin_a
+    local new_z = -x * sin_a + z * cos_a
+    return new_x, y, new_z
+end
+
 local function draw_ascii(vertices, zoom)
     local width, height = 160, 40
     local grid = {}
@@ -46,7 +54,7 @@ local function draw_ascii(vertices, zoom)
     for _, v in ipairs(vertices) do
         local x, y = project_perspective(v.x, v.y, v.z, zoom)
         local shifted_x = math.floor((width / 2) + x)
-        local shifted_y = math.floor((height / 2) + y)
+        local shifted_y = math.floor((height / 2) - y)
 
         if shifted_x >= 0 and shifted_x < width and shifted_y >= 0 and shifted_y < height then
             local row = grid[shifted_y]
@@ -54,10 +62,33 @@ local function draw_ascii(vertices, zoom)
         end
     end
 
-    os.execute("clear") -- Clear terminal
+    os.execute("clear")
     for _, line in ipairs(grid) do print(line) end
+end
+
+local function rotate_model(vertices, angle_y)
+    local rotated_vertices = {}
+
+    for _, v in ipairs(vertices) do
+        local x, y, z = rotate_y(v.x, v.y, v.z, angle_y)
+
+        table.insert(rotated_vertices, { x = x, y = y, z = z })
+    end
+
+    return rotated_vertices
 end
 
 local filepath = args.filepath
 local model = read_obj(filepath)
-draw_ascii(model.vertices, 5)
+
+
+local angle_y = 0
+local time = 0
+
+while time < 500 do
+    local rotated_vertices = rotate_model(model.vertices, angle_y)
+    draw_ascii(rotated_vertices, 2)
+    angle_y = angle_y + 1
+    time = time + 1
+    os.execute("sleep 0.01")
+end
