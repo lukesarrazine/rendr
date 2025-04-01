@@ -47,13 +47,14 @@ local function rotate_y(x, y, z, angle)
 end
 
 local function draw_ascii(vertices, zoom)
-    local width, height = 160, 40
+    local aspect_ratio = 2
+    local width, height = 100, 40
     local grid = {}
     for i = 0, height - 1 do grid[i] = string.rep(" ", width) end
 
     for _, v in ipairs(vertices) do
         local x, y = project_perspective(v.x, v.y, v.z, zoom)
-        local shifted_x = math.floor((width / 2) + x)
+        local shifted_x = math.floor((width / 2) + x * aspect_ratio)
         local shifted_y = math.floor((height / 2) - y)
 
         if shifted_x >= 0 and shifted_x < width and shifted_y >= 0 and shifted_y < height then
@@ -82,7 +83,7 @@ local filepath = args.filepath
 local model = read_obj(filepath)
 
 
-local angle_y = 0
+local angle_x, angle_y, angle_z = 0, 0, 0
 local time = 0
 
 while time < 500 do
@@ -90,5 +91,5 @@ while time < 500 do
     draw_ascii(rotated_vertices, 1)
     angle_y = angle_y + 1
     time = time + 1
-    os.execute("sleep 0.01")
+    os.execute("sleep 0.005")
 end
